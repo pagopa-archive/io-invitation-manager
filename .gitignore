@@ -1,0 +1,11 @@
+# Editors
+.vscode
+
+# Node packages
+node_modules
+
+# Build directory
+build
+
+# Logs
+logs
