@@ -27,6 +27,7 @@
     "io"
   ],
   "dependencies": {
+    "io-ts": "^1.8.2",
     "winston": "^3.2.1"
   }
 }

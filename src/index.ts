@@ -1,11 +1,13 @@
 import { createLogger, format, transports } from "winston";
 
+import * as config from "./config";
+
 const app = {
   name: "io-invitaition-manager",
 };
 
 const logger = createLogger({
-  level: "info",
+  level: config.logLevel,
   format: format.combine(
     format.timestamp({
       format: "YYYY-MM-DD HH:mm:ss",
