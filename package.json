@@ -1,0 +1,33 @@
+{
+  "name": "io-invitation-manager",
+  "version": "1.0.0",
+  "description": "Manages invitations for the IO application",
+  "main": "build/index.js",
+  "repository": "git@github.com:teamdigitale/io-invitation-manager.git",
+  "author": "Francesco Persico <francesco.persico@wellnet.it>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^10.12.26",
+    "prettier": "^1.16.4",
+    "tsc-watch": "^2.1.2",
+    "tslint": "^5.13.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.3.3333"
+  },
+  "scripts": {
+    "postinstall": "if [ $BUILD_ON_INSTALL ]; then yarn build; fi",
+    "lint": "tslint -p . -c tslint.json -t verbose",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc-watch --onSuccess 'yarn start'",
+    "build": "tsc",
+    "start": "node build/index.js"
+  },
+  "keywords": [
+    "io"
+  ],
+  "dependencies": {
+    "io-ts": "^1.8.2",
+    "winston": "^3.2.1"
+  }
+}
