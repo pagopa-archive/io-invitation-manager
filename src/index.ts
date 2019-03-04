@@ -1,8 +1,8 @@
 import { createLogger, format, transports } from "winston";
 
-import { loadGoogleConfig, loglevel } from "./config";
+import { loadGoogleConfig, loglevel, processIntervalS } from "./config";
 import { createGoogleClient } from "./google";
-import { loadPrivateKey } from "./utils";
+import { loadPrivateKey, sleep } from "./utils";
 
 const app = {
   name: "io-invitaition-manager",
@@ -33,7 +33,7 @@ const logger = createLogger({
 async function startProcessing(
   googleClient: ReturnType<typeof createGoogleClient>,
 ) {
-  logger.info("Retriving unprocessed invitations");
+  logger.info("Retreiving unprocessed invitations");
   // Get the unprocessed invitations reading the google spreadsheet
   const unprocessedInvitationsOrError = await googleClient.getUnprocessedInvitations();
   if (unprocessedInvitationsOrError.isLeft()) {
@@ -65,7 +65,7 @@ async function startProcessing(
 }
 
 // The main application function
-function startService() {
+async function startService() {
   logger.info("Service started");
 
   // Load the google configuration
@@ -101,9 +101,11 @@ function startService() {
     spreadsheetId,
   );
 
-  // TODO: Define a better way to handle the loop.
-  // Move the interval to an enviroment variable.
-  setInterval(() => startProcessing(googleClient).then(() => 0), 5000);
+  while (true) {
+    await startProcessing(googleClient);
+    logger.info(`Waiting ${processIntervalS} seconds before next processing.`);
+    await sleep(processIntervalS * 1000);
+  }
 }
 
-startService();
+startService().then(() => 0);
