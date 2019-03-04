@@ -27,6 +27,8 @@
     "io"
   ],
   "dependencies": {
+    "fp-ts": "^1.14.3",
+    "googleapis": "^37.2.0",
     "io-ts": "^1.8.2",
     "winston": "^3.2.1"
   }
