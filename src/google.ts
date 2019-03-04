@@ -21,16 +21,24 @@ export function createGoogleClient(
   clientEmail: string,
   key: string,
   spreadsheetId: string,
+  betaGroupKey: string,
 ) {
   // Create the JWT client used for all the APIs
   const jwtClient = new google.auth.JWT({
     email: clientEmail,
     key,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    scopes: [
+      "https://www.googleapis.com/auth/spreadsheets",
+      "https://www.googleapis.com/auth/admin.directory.group",
+      "https://www.googleapis.com/auth/admin.directory.group.member",
+    ],
   });
 
   // The API object used to read and manipulate Google Sheets
   const sheets = google.sheets("v4");
+
+  // The API object used to read and manipulate Google Groups Members
+  const members = google.admin("directory_v1").members;
 
   // A function to get the unpreocessed invitations from the google spreadsheet
   async function getUnprocessedInvitations(): Promise<
@@ -96,9 +104,32 @@ export function createGoogleClient(
     }
   }
 
+  /**
+   *
+   * A function to add a member to the beta group.
+   *
+   * @param email The email of the user you want to add to the beta group
+   */
+  async function addMemberToBetaGroup(email: string) {
+    try {
+      const response = await members.insert({
+        auth: jwtClient,
+        groupKey: betaGroupKey,
+        requestBody: {
+          email,
+        },
+      });
+
+      return right(response);
+    } catch (e) {
+      return left(e);
+    }
+  }
+
   return {
     getUnprocessedInvitations,
     setInvitationAsProcessed,
+    addMemberToBetaGroup,
   };
 }
 

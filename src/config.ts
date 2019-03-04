@@ -23,6 +23,7 @@ export type GoogleConfig = {
   clientEmail: string;
   privateKeyPath: string;
   spreadsheetId: string;
+  betaGroupKey: string;
 };
 
 export const loglevel = LogLevel.decode(
@@ -62,10 +63,19 @@ export function loadGoogleConfig(): Either<Error, GoogleConfig> {
   }
   const googleSpreadsheetId = maybeGoogleSpreadsheetId.value;
 
+  const maybeGoogleBetaGroupKey = fromNullable(
+    process.env.IO_IM_GOOGLE_BETA_GROUP_KEY,
+  );
+  if (maybeGoogleBetaGroupKey.isNone()) {
+    return left(Error("You must set IO_IM_GOOGLE_BETA_GROUP_KEY"));
+  }
+  const googleBetaGroupKey = maybeGoogleBetaGroupKey.value;
+
   const config: GoogleConfig = {
     clientEmail: googleClientEmail,
     privateKeyPath: googlePrivateKeyPath,
     spreadsheetId: googleSpreadsheetId,
+    betaGroupKey: googleBetaGroupKey,
   };
 
   return right(config);

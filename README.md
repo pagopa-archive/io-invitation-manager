@@ -11,3 +11,4 @@ Those are all Environment variables needed by the application:
 | IO_IM_GOOGLE_CLIENT_EMAIL | The client email of the google service-account | string | |
 | IO_IM_GOOGLE_PRIVATE_KEY_PATH | The path of the google service-account private key | string | |
 | IO_IM_GOOGLE_SPREADSHEET_ID | The id of the google spreadsheet where invitations are stored | string | |  
+| IO_IM_GOOGLE_BETA_GROUP_KEY | The key of the google beta group | string | |

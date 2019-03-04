@@ -53,9 +53,28 @@ async function startProcessing(
   // and use the corresponding api to add the invitation email to the
   // beta group.
   unprocessedInvitations.forEach(async invitation => {
-    // TODO: Add real invitation processing
+    // Check the Invitation platform (Android/iOS)
+    const platform = invitation.platform;
 
-    // Update the invitation status in the Spreadsheet
+    // TODO: Add the logic to handle Invitations for iOS platform
+    if (platform === "iOS") {
+      return;
+    }
+
+    // Call the API to add the member to the beta group.
+    const addMemberToBetaGroupOrError = await googleClient.addMemberToBetaGroup(
+      invitation.email,
+    );
+
+    if (addMemberToBetaGroupOrError.isLeft()) {
+      logger.error(
+        `Error adding ${invitation.email} to the beta group.`,
+        addMemberToBetaGroupOrError.value,
+      );
+    }
+
+    // TODO: Add the error to the spreadsheet
+    // Update the Invitation status in the Spreadsheet
     const resultOrError = await googleClient.setInvitationAsProcessed(
       invitation.meta.rowIndex,
     );
@@ -85,6 +104,7 @@ async function startService() {
     clientEmail,
     privateKeyPath: googlePrivateKeyPath,
     spreadsheetId,
+    betaGroupKey,
   } = googleConfigOrError.value;
 
   // Load the private key from file
@@ -101,6 +121,7 @@ async function startService() {
     clientEmail,
     maybeGooglePrivateKey.value,
     spreadsheetId,
+    betaGroupKey,
   );
 
   while (true) {
