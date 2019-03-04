@@ -1,4 +1,4 @@
-import { Either, left, right } from "fp-ts/lib/Either";
+import { Either, left, right, tryCatch } from "fp-ts/lib/Either";
 import { google } from "googleapis";
 
 import { Invitation } from "./types";
@@ -38,7 +38,7 @@ export function createGoogleClient(
   const sheets = google.sheets("v4");
 
   // The API object used to read and manipulate Google Groups Members
-  const members = google.admin("directory_v1").members;
+  const getGroupMembers = google.admin("directory_v1").members;
 
   // A function to get the unpreocessed invitations from the google spreadsheet
   async function getUnprocessedInvitations(): Promise<
@@ -106,24 +106,21 @@ export function createGoogleClient(
 
   /**
    *
-   * A function to add a member to the beta group.
+   * Adds a member to the beta group.
    *
    * @param email The email of the user you want to add to the beta group
    */
   async function addMemberToBetaGroup(email: string) {
-    try {
-      const response = await members.insert({
-        auth: jwtClient,
-        groupKey: betaGroupKey,
-        requestBody: {
-          email,
-        },
-      });
-
-      return right(response);
-    } catch (e) {
-      return left(e);
-    }
+    return tryCatch(
+      async () =>
+        await getGroupMembers.insert({
+          auth: jwtClient,
+          groupKey: betaGroupKey,
+          requestBody: {
+            email,
+          },
+        }),
+    );
   }
 
   return {
