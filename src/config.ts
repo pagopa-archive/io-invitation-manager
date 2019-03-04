@@ -2,6 +2,7 @@ import { Either, left, right } from "fp-ts/lib/Either";
 import { fromNullable } from "fp-ts/lib/Option";
 import * as t from "io-ts";
 import * as iot from "italia-ts-commons";
+import { Second } from "italia-ts-commons/lib/units";
 
 const IO_IM_DEFAULT_LOGGER_LEVEL = "info";
 const IO_IM_DEFAULT_PROCESSING_INTERVAL_S = 60 * 60;
@@ -30,7 +31,7 @@ export const loglevel = LogLevel.decode(
 
 export const processIntervalS = iot.numbers.IntegerFromString.decode(
   process.env.IO_IM_PROCESSING_INTERVAL_S,
-).getOrElse(IO_IM_DEFAULT_PROCESSING_INTERVAL_S);
+).getOrElse(IO_IM_DEFAULT_PROCESSING_INTERVAL_S) as Second;
 
 /**
  * A function that checks that all the required enviroments variables related

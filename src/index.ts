@@ -1,8 +1,10 @@
+import * as iot from "italia-ts-commons";
+import { Millisecond } from "italia-ts-commons/lib/units";
 import { createLogger, format, transports } from "winston";
 
 import { loadGoogleConfig, loglevel, processIntervalS } from "./config";
 import { createGoogleClient } from "./google";
-import { loadPrivateKey, sleep } from "./utils";
+import { loadPrivateKey } from "./utils";
 
 const app = {
   name: "io-invitaition-manager",
@@ -104,7 +106,7 @@ async function startService() {
   while (true) {
     await startProcessing(googleClient);
     logger.info(`Waiting ${processIntervalS} seconds before next processing.`);
-    await sleep(processIntervalS * 1000);
+    await iot.promises.timeoutPromise((processIntervalS * 1000) as Millisecond);
   }
 }
 
