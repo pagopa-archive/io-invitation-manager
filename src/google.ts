@@ -14,6 +14,8 @@ const APPROVED_COLUMN_INDEX = 19;
 const PROCESSED_COLUMN_INDEX = 20;
 // The letter in A1 notation where is stored if an Invitation has been processed.
 const PROCESSED_COLUMN_LETTER = "U";
+// A constant that represent a sucessfull processing
+const PROCESSING_SUCCESS = "TRUE";
 
 export function createGoogleClient(
   clientEmail: string,
@@ -83,7 +85,7 @@ export function createGoogleClient(
           valueInputOption: "RAW",
           requestBody: {
             range: `${PROCESSED_COLUMN_LETTER}${rowIndex}`,
-            values: [["TRUE"]],
+            values: [[PROCESSING_SUCCESS]],
           },
         },
         {},
