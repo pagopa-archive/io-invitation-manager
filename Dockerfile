@@ -1,5 +1,7 @@
 FROM node:10.13.0
 
+LABEL maintainer="Federico Feroldi <federico@teamdigitale.governo.it>"
+
 # Create app directory
 WORKDIR /usr/src/app
 
