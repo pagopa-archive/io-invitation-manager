@@ -7,6 +7,8 @@
   "author": "Francesco Persico <francesco.persico@wellnet.it>",
   "license": "MIT",
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.3.0",
+    "@types/luxon": "^1.11.1",
     "@types/node": "^10.12.26",
     "prettier": "^1.16.4",
     "tsc-watch": "^2.1.2",
@@ -27,6 +29,7 @@
     "io"
   ],
   "dependencies": {
+    "appstoreconnect": "^0.2.0",
     "fp-ts": "^1.14.3",
     "googleapis": "^37.2.0",
     "io-ts": "^1.8.2",

@@ -14,23 +14,33 @@ const APPROVED_COLUMN_INDEX = 19;
 const PROCESSED_COLUMN_INDEX = 20;
 // The letter in A1 notation where is stored if an Invitation has been processed.
 const PROCESSED_COLUMN_LETTER = "U";
-// A constant that represent a sucessfull processing
-const PROCESSING_SUCCESS = "TRUE";
+// A constant that represent a completed processing
+const PROCESSING_COMPLETED = "TRUE";
+// The letter in A1 notation of the column where we want to write the processing error
+const PROCESSING_ERROR_COLUMN_LETTER = "V";
 
 export function createGoogleClient(
   clientEmail: string,
   key: string,
   spreadsheetId: string,
+  betaGroupKey: string,
 ) {
   // Create the JWT client used for all the APIs
   const jwtClient = new google.auth.JWT({
     email: clientEmail,
     key,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    scopes: [
+      "https://www.googleapis.com/auth/spreadsheets",
+      "https://www.googleapis.com/auth/admin.directory.group",
+      "https://www.googleapis.com/auth/admin.directory.group.member",
+    ],
   });
 
   // The API object used to read and manipulate Google Sheets
   const sheets = google.sheets("v4");
+
+  // The API object used to read and manipulate Google Groups Members
+  const getGroupMembers = google.admin("directory_v1").members;
 
   // A function to get the unpreocessed invitations from the google spreadsheet
   async function getUnprocessedInvitations(): Promise<
@@ -75,17 +85,20 @@ export function createGoogleClient(
   }
 
   // A function to update the Invitation processed status in the spreadsheet.
-  async function setInvitationAsProcessed(rowIndex: number) {
+  async function setInvitationAsProcessed(
+    rowIndex: number,
+    errorMessage?: string,
+  ) {
     try {
       const response = await sheets.spreadsheets.values.update(
         {
           auth: jwtClient,
           spreadsheetId,
-          range: `U${rowIndex}`,
+          range: `${PROCESSED_COLUMN_LETTER}${rowIndex}:${PROCESSING_ERROR_COLUMN_LETTER}${rowIndex}`,
           valueInputOption: "RAW",
           requestBody: {
-            range: `${PROCESSED_COLUMN_LETTER}${rowIndex}`,
-            values: [[PROCESSING_SUCCESS]],
+            range: `${PROCESSED_COLUMN_LETTER}${rowIndex}:${PROCESSING_ERROR_COLUMN_LETTER}${rowIndex}`,
+            values: [[PROCESSING_COMPLETED, errorMessage]],
           },
         },
         {},
@@ -96,9 +109,31 @@ export function createGoogleClient(
     }
   }
 
+  /**
+   *
+   * Adds a member to the beta group.
+   *
+   * @param email The email of the user you want to add to the beta group
+   */
+  async function addMemberToBetaGroup(email: string) {
+    try {
+      const result = await getGroupMembers.insert({
+        auth: jwtClient,
+        groupKey: betaGroupKey,
+        requestBody: {
+          email,
+        },
+      });
+      return right(result);
+    } catch (e) {
+      return left(e);
+    }
+  }
+
   return {
     getUnprocessedInvitations,
     setInvitationAsProcessed,
+    addMemberToBetaGroup,
   };
 }
 
