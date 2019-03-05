@@ -1,6 +1,6 @@
 {
   "name": "io-invitation-manager",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Manages invitations for the IO application",
   "main": "build/index.js",
   "repository": "git@github.com:teamdigitale/io-invitation-manager.git",
