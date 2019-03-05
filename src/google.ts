@@ -1,4 +1,4 @@
-import { Either, left, right, tryCatch } from "fp-ts/lib/Either";
+import { Either, left, right } from "fp-ts/lib/Either";
 import { google } from "googleapis";
 
 import { Invitation } from "./types";
@@ -14,8 +14,10 @@ const APPROVED_COLUMN_INDEX = 19;
 const PROCESSED_COLUMN_INDEX = 20;
 // The letter in A1 notation where is stored if an Invitation has been processed.
 const PROCESSED_COLUMN_LETTER = "U";
-// A constant that represent a sucessfull processing
-const PROCESSING_SUCCESS = "TRUE";
+// A constant that represent a completed processing
+const PROCESSING_COMPLETED = "TRUE";
+// The letter in A1 notation of the column where we want to write the processing error
+const PROCESSING_ERROR_COLUMN_LETTER = "V";
 
 export function createGoogleClient(
   clientEmail: string,
@@ -83,17 +85,20 @@ export function createGoogleClient(
   }
 
   // A function to update the Invitation processed status in the spreadsheet.
-  async function setInvitationAsProcessed(rowIndex: number) {
+  async function setInvitationAsProcessed(
+    rowIndex: number,
+    errorMessage?: string,
+  ) {
     try {
       const response = await sheets.spreadsheets.values.update(
         {
           auth: jwtClient,
           spreadsheetId,
-          range: `U${rowIndex}`,
+          range: `${PROCESSED_COLUMN_LETTER}${rowIndex}:${PROCESSING_ERROR_COLUMN_LETTER}${rowIndex}`,
           valueInputOption: "RAW",
           requestBody: {
-            range: `${PROCESSED_COLUMN_LETTER}${rowIndex}`,
-            values: [[PROCESSING_SUCCESS]],
+            range: `${PROCESSED_COLUMN_LETTER}${rowIndex}:${PROCESSING_ERROR_COLUMN_LETTER}${rowIndex}`,
+            values: [[PROCESSING_COMPLETED, errorMessage]],
           },
         },
         {},
@@ -111,16 +116,18 @@ export function createGoogleClient(
    * @param email The email of the user you want to add to the beta group
    */
   async function addMemberToBetaGroup(email: string) {
-    return tryCatch(
-      async () =>
-        await getGroupMembers.insert({
-          auth: jwtClient,
-          groupKey: betaGroupKey,
-          requestBody: {
-            email,
-          },
-        }),
-    );
+    try {
+      const result = await getGroupMembers.insert({
+        auth: jwtClient,
+        groupKey: betaGroupKey,
+        requestBody: {
+          email,
+        },
+      });
+      return right(result);
+    } catch (e) {
+      return left(e);
+    }
   }
 
   return {

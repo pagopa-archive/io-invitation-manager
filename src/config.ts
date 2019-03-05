@@ -26,6 +26,13 @@ export type GoogleConfig = {
   betaGroupKey: string;
 };
 
+export type AppStoreConnectConfig = {
+  privateKeyId: string;
+  privateKeyPath: string;
+  issuerId: string;
+  betaGroupId: string;
+};
+
 export const loglevel = LogLevel.decode(
   process.env.IO_IM_LOGGER_LEVEL,
 ).getOrElse(IO_IM_DEFAULT_LOGGER_LEVEL);
@@ -76,6 +83,58 @@ export function loadGoogleConfig(): Either<Error, GoogleConfig> {
     privateKeyPath: googlePrivateKeyPath,
     spreadsheetId: googleSpreadsheetId,
     betaGroupKey: googleBetaGroupKey,
+  };
+
+  return right(config);
+}
+
+/**
+ * Checks that all the required enviroments variables related
+ * to the app store connect services are set and returns an error
+ * or AppStoreConnectConfig object.
+ */
+export function loadAppStoreConnectConfig(): Either<
+  Error,
+  AppStoreConnectConfig
+> {
+  const maybeAppStoreConnectPrivateKeyId = fromNullable(
+    process.env.IO_IM_APP_STORE_CONNECT_PRIVATE_KEY_ID,
+  );
+  if (maybeAppStoreConnectPrivateKeyId.isNone()) {
+    return left(Error("You must set IO_IM_APP_STORE_CONNECT_PRIVATE_KEY_ID"));
+  }
+  const appStoreConnectPrivateKeyId = maybeAppStoreConnectPrivateKeyId.value;
+
+  const maybeAppStoreConnectPrivateKeyPath = fromNullable(
+    process.env.IO_IM_APP_STORE_CONNECT_PRIVATE_KEY_PATH,
+  );
+  if (maybeAppStoreConnectPrivateKeyPath.isNone()) {
+    return left(Error("You must set IO_IM_APP_STORE_CONNECT_PRIVATE_KEY_PATH"));
+  }
+  const appStoreConnectPrivateKeyPath =
+    maybeAppStoreConnectPrivateKeyPath.value;
+
+  const maybeAppStoreConnectIssuerId = fromNullable(
+    process.env.IO_IM_APP_STORE_CONNECT_ISSUER_ID,
+  );
+  if (maybeAppStoreConnectIssuerId.isNone()) {
+    return left(Error("You must set IO_IM_APP_STORE_CONNECT_ISSUER_ID"));
+  }
+  const appStoreConnectIssuerId = maybeAppStoreConnectIssuerId.value;
+
+  const maybeAppStoreConnectBetaGroupId = fromNullable(
+    process.env.IO_IM_APP_STORE_CONNECT_BETA_GROUP_ID,
+  );
+  if (maybeAppStoreConnectBetaGroupId.isNone()) {
+    return left(Error("You must set IO_IM_APP_STORE_CONNECT_BETA_GROUP_ID"));
+  }
+  const appStoreConnectBetaGroupId = maybeAppStoreConnectBetaGroupId.value;
+
+  const config: AppStoreConnectConfig = {
+    privateKeyId: appStoreConnectPrivateKeyId,
+    privateKeyPath: appStoreConnectPrivateKeyPath,
+    issuerId: appStoreConnectIssuerId,
+    betaGroupId: appStoreConnectBetaGroupId,
   };
 
   return right(config);
