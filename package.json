@@ -32,7 +32,7 @@
     "appstoreconnect": "^0.2.0",
     "fp-ts": "^1.14.3",
     "googleapis": "^37.2.0",
-    "io-ts": "^1.8.2",
+    "io-ts": "^1.10.4",
     "italia-ts-commons": "^4.0.1",
     "winston": "^3.2.1"
   }
