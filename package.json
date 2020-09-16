@@ -30,7 +30,7 @@
   ],
   "dependencies": {
     "appstoreconnect": "^0.2.0",
-    "fp-ts": "^1.14.3",
+    "fp-ts": "^1.19.5",
     "googleapis": "^37.2.0",
     "io-ts": "^1.8.2",
     "italia-ts-commons": "^4.0.1",
